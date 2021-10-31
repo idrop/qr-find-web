@@ -5,11 +5,12 @@ extern crate log;
 #[macro_use]
 extern crate serde_json;
 
+use std::env;
 use std::io;
 
 use actix_files::Files;
+use actix_web::{App, HttpServer, web};
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
 use env_logger::Env;
 use handlebars::Handlebars;
 
@@ -33,14 +34,14 @@ async fn main() -> io::Result<()> {
             .wrap(Logger::new("%a %{User-Agent}i"))
             // .wrap(error_handlers())
             .app_data(handlebars_ref.clone())
+            .service(Files::new("/robots.txt", "web/templates/assets/robots.txt"))
             .service(Files::new("/assets", "web/templates/assets/"))
-            .service(Files::new("/robots.txt", "web/templates/robots.txt"))
             .service(routes::index)
             .service(routes::index_post)
             .service(routes::confirm_post)
     })
-    .workers(3)
-    .bind("0.0.0.0:8080")?
-    .run()
-    .await
+        .workers(env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap())
+        .bind("0.0.0.0:8080")?
+        .run()
+        .await
 }
