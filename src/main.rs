@@ -34,6 +34,7 @@ async fn main() -> io::Result<()> {
             // .wrap(error_handlers())
             .app_data(handlebars_ref.clone())
             .service(Files::new("/assets", "web/templates/assets/"))
+            .service(Files::new("/robots.txt", "web/templates/robots.txt"))
             .service(routes::index)
             .service(routes::index_post)
             .service(routes::confirm_post)
