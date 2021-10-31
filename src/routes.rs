@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, web};
+use actix_web::{web, HttpResponse};
 use handlebars::Handlebars;
 use validator::Validate;
 

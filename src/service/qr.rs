@@ -7,7 +7,6 @@ const BORDER: i32 = 4;
 
 // Creates a single QR Code, then prints it to the console.
 pub fn get_qr_string(url_prefix: &str, id: &str) -> String {
-
     let url = &[url_prefix, id].concat();
     // Make and print the QR Code symbol
     let qr: QrCode = QrCode::encode_text(url, QrCodeEcc::High).unwrap();
