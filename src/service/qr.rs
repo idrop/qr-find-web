@@ -3,15 +3,16 @@ extern crate qrcodegen;
 use qrcodegen::QrCode;
 use qrcodegen::QrCodeEcc;
 
-// Creates a single QR Code, then prints it to the console.
-pub fn get_qr_string() -> String {
-    let text: &'static str = "https://seven.cn/A3tUiu/01itesttest"; // User-supplied Unicode text
-                                                                    // Error correction level
+const BORDER: i32 = 4;
 
+// Creates a single QR Code, then prints it to the console.
+pub fn get_qr_string(url_prefix: &str, id: &str) -> String {
+
+    let url = &[url_prefix, id].concat();
     // Make and print the QR Code symbol
-    let qr: QrCode = QrCode::encode_text(text, QrCodeEcc::High).unwrap();
+    let qr: QrCode = QrCode::encode_text(url, QrCodeEcc::High).unwrap();
     // to_svg_string(&qr, 4)
-    get_svg_path(qr, 4)
+    get_svg_path(qr, BORDER)
 }
 
 // Returns a string of SVG code for an image depicting

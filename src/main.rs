@@ -23,7 +23,7 @@ async fn main() -> io::Result<()> {
 
     let mut handlebars = Handlebars::new();
     handlebars
-        .register_templates_directory(".html", "./web/templates")
+        .register_templates_directory(".hbs", "./web/templates")
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
 

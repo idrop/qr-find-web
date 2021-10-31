@@ -1,6 +1,5 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 use handlebars::Handlebars;
-
 use validator::Validate;
 
 use crate::data;
@@ -9,7 +8,11 @@ use crate::service::manager;
 // Macro documentation can be found in the actix_web_codegen crate
 #[get("/")]
 pub async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
-    let data = json!({});
+    let data = json!({
+        "title" : "QR Lost Things",
+        "parent" : "template",
+    });
+
     let body = hb.render("index", &data).unwrap();
     HttpResponse::Ok().body(body)
 }
@@ -24,6 +27,8 @@ pub async fn index_post(
             let email = &email_form.email;
             let cid = manager::send_confirm_code(&email).unwrap();
             let data = json!({
+                "title" : "QR Lost Things",
+                "parent" : "template",
                 "cid": cid,
                 "email" : &email,
             });
@@ -33,6 +38,8 @@ pub async fn index_post(
             warn!("😀 just logging an err with err: {}", e);
 
             let data = json!({
+                "title" : "QR Lost Things",
+                "parent" : "template",
                 "email": &email_form.email,
                 "email-error": true,
             });
@@ -52,6 +59,8 @@ pub async fn confirm_post(
         Ok(_) => {
             let qr_svg = manager::check_qr_code(&confirm_form.cid, &confirm_form.code);
             let data = json!({
+                "title" : "QR Lost Things",
+                "parent" : "template",
                 "qr": qr_svg,
             });
             hb.render("done", &data).unwrap()
