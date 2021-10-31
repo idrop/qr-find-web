@@ -13,4 +13,5 @@ FROM    gcr.io/distroless/cc
 WORKDIR /app
 COPY    --from=build /build/target/release/app /app
 COPY    web /app/web
+EXPOSE  8080
 CMD     ["./app"]
