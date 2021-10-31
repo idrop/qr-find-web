@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <link href="assets/favicon.ico" rel="icon"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <meta content="#000000" name="theme-color"/>
-    <meta content="get your lost things back with a QR code" name="description"
-    />
-    <link rel="apple-touch-icon" href="assets/logo192.png"/>
-    <link rel="manifest" href="assets/manifest.json"/>
-    <link rel="stylesheet" href="assets/index.css">
-    <title>QR Lost Things</title>
-</head>
-<body>
+{{#*inline "page"}}
 <div class="form-container">
     <p>Enter the 6 digit confirm code sent to {{email}}</p>
     <form class="confirm-form" method="post" action="/confirm">
@@ -25,7 +11,5 @@
         <button class="form-field" type="submit">Complete</button>
     </form>
 </div>
-
-
-</body>
-</html>
+{{/inline}}
+{{> (lookup this "parent")}}
