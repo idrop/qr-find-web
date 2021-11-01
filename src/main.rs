@@ -40,8 +40,8 @@ async fn main() -> io::Result<()> {
             .service(routes::index_post)
             .service(routes::confirm_post)
     })
-        .workers(env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap())
-        .bind("0.0.0.0:8080")?
-        .run()
-        .await
+    .workers(env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap())
+    .bind("0.0.0.0:8080")?
+    .run()
+    .await
 }
