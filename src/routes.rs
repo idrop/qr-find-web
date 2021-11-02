@@ -5,7 +5,11 @@ use validator::Validate;
 use crate::data;
 use crate::service::manager;
 
-// Macro documentation can be found in the actix_web_codegen crate
+#[get("/healthcheck")]
+pub async fn healthcheck() -> HttpResponse {
+    HttpResponse::Ok().finish()
+}
+
 #[get("/")]
 pub async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
     let data = json!({
@@ -16,6 +20,19 @@ pub async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
     let body = hb.render("index", &data).unwrap();
     HttpResponse::Ok().body(body)
 }
+
+#[get("/test")]
+pub async fn test(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
+    let qr_svg = manager::check_qr_code("", "");
+    let data = json!({
+                "title" : "QR Lost Things Test",
+                "parent" : "template",
+                "qr": qr_svg,
+            });
+    let body = hb.render("done", &data).unwrap();
+    HttpResponse::Ok().body(body)
+}
+
 
 #[post("/")]
 pub async fn index_post(

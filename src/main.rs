@@ -7,6 +7,7 @@ extern crate serde_json;
 
 use std::env;
 use std::io;
+use std::sync::Arc;
 
 use actix_files::Files;
 use actix_web::{App, HttpServer, web};
@@ -23,6 +24,7 @@ async fn main() -> io::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let mut handlebars = Handlebars::new();
+    handlebars.set_dev_mode(true);
     handlebars
         .register_templates_directory(".hbs", "./web/templates")
         .unwrap();
@@ -32,16 +34,27 @@ async fn main() -> io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
-            // .wrap(error_handlers())
             .app_data(handlebars_ref.clone())
             .service(Files::new("/robots.txt", "web/templates/assets/robots.txt"))
             .service(Files::new("/assets", "web/templates/assets/"))
             .service(routes::index)
             .service(routes::index_post)
             .service(routes::confirm_post)
+            .service(routes::healthcheck)
+            .service(routes::test)
     })
-    .workers(env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap())
-    .bind("0.0.0.0:8080")?
-    .run()
-    .await
+        .workers(num_workers())
+        .bind(bind_address())?
+        .run()
+        .await
+}
+
+fn num_workers() -> usize {
+    env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap()
+}
+
+fn bind_address() -> String {
+    let address = env::var("ADDRESS").unwrap_or("0.0.0.0".to_string());
+    let port = env::var("PORT").unwrap_or("8080".to_string());
+    [address, ":".to_string(), port].concat()
 }
