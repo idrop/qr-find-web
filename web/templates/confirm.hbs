@@ -1,13 +1,13 @@
 {{#*inline "page"}}
-<div class="form-container">
-    <p>Enter the 6 digit confirm code sent to {{email}}</p>
-    <form class="confirm-form" method="post" action="/confirm">
-        <input type="hidden" name="cid" value="{{cid}}">
-        <input id="code" class="form-field" type="number" placeholder="6 number code" name="code" maxlength="6"
-               minlength="6"/>
+    <div class="form-container">
+        <p>Enter the 6 digit confirm code sent to {{email}}</p>
+        <form action="/confirm" method="post">
+            <input type="hidden" name="cid" value="{{cid}}">
+            <input id="code" class="form-field" type="number" placeholder="6 number code" name="code" maxlength="6"
+                   minlength="6"/>
 
-        <button class="form-field" type="submit">Complete</button>
-    </form>
-</div>
+            <button class="form-field" type="submit">Complete</button>
+        </form>
+    </div>
 {{/inline}}
 {{> (lookup this "parent")}}
