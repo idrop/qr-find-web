@@ -6,12 +6,12 @@ use qrcodegen::QrCodeEcc;
 const BORDER: i32 = 4;
 
 // Creates a single QR Code, then prints it to the console.
-pub fn get_qr_string(url_prefix: &str, id: &str) -> String {
+pub fn get_qr_path_d(url_prefix: &str, id: &str) -> String {
     let url = &[url_prefix, id].concat();
     // Make and print the QR Code symbol
     let qr: QrCode = QrCode::encode_text(url, QrCodeEcc::High).unwrap();
     // to_svg_string(&qr, 4)
-    get_svg_path(qr, BORDER)
+    get_svg_path_d(qr, BORDER)
 }
 
 // Returns a string of SVG code for an image depicting
@@ -27,26 +27,24 @@ fn to_svg_string(qr: QrCode, border: i32) -> String {
     result += &format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 {0} {0}\" stroke=\"none\">\n", dimension);
     result += "\t<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n";
-    result += &*get_svg_path(qr, border);
+    result += &*get_svg_path_d(qr, border);
     result += "</svg>\n";
     result
 }
 
-fn get_svg_path(qr: QrCode, border: i32) -> String {
-    let mut result = String::new();
-    result += "\t<path d=\"";
+fn get_svg_path_d(qr: QrCode, border: i32) -> String {
+    let mut v: Vec<String> = Vec::new();
     let qr_size: i32 = qr.size();
 
     for y in 0..qr_size {
         for x in 0..qr_size {
             if qr.get_module(x, y) {
                 if x != 0 || y != 0 {
-                    result += " ";
+                    v.push(String::from(" "));
                 }
-                result += &format!("M{},{}h1v1h-1z", x + border, y + border);
+                v.push(format!("M{},{}h1v1h-1z", x + border, y + border));
             }
         }
     }
-    result += "\" fill=\"#000000\"/>\n";
-    result
+    v.concat()
 }

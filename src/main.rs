@@ -27,7 +27,7 @@ async fn main() -> io::Result<()> {
     handlebars.set_dev_mode(true);
     handlebars
         .register_templates_directory(".hbs", "./web/templates")
-        .unwrap();
+        .expect("Couldn't register handlebars template dir");
     let handlebars_ref = web::Data::new(handlebars);
 
     HttpServer::new(move || {
@@ -40,6 +40,7 @@ async fn main() -> io::Result<()> {
             .service(routes::index)
             .service(routes::index_post)
             .service(routes::confirm_post)
+            .service(routes::print)
             .service(routes::healthcheck)
             .service(routes::test)
     })

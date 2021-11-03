@@ -1,9 +1,9 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:100);
+@import url(https://fonts.googleapis.com/css?family=Inconsolata);
 
 body {
-    font-family: "Roboto", "Arial", sans-serif;
+    font-family: "Inconsolata", "Arial", sans-serif;
     font-size: larger;
-    color: #d58447;
+    color: #ea9656;
     background: #321325;
     padding: 10px;
 }
@@ -13,7 +13,7 @@ a {
 }
 
 .form-container {
-    background-color: #5F0F40;
+    background-color: #531038;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.1);
     padding: 20px;
 }
@@ -26,17 +26,24 @@ a {
 
 input {
     background: white;
-    box-shadow: 2px 2px #222222;
+    box-shadow: 4px 4px #321325;
 }
 
 .error {
     border: 2px solid #ffa4a4;
 }
 
+
 button {
     background: #FCDC4D;
+    font-family: "Inconsolata", "Arial", sans-serif;
     font-weight: bold;
-    color: black;
+    font-size: large;
+    color: #321325;
     cursor: pointer;
-    box-shadow: 2px 2px #222222;
+    box-shadow: 4px 4px #321325;
+}
+
+button:hover {
+    box-shadow: 8px 8px #321325;
 }

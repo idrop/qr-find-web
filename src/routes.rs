@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 use handlebars::Handlebars;
 use validator::Validate;
 
@@ -23,11 +23,11 @@ pub async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
 
 #[get("/test")]
 pub async fn test(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
-    let qr_svg = manager::check_qr_code("", "");
+    let qr_svg_path_d = manager::get_qr_code_path_d("test").unwrap();
     let data = json!({
                 "title" : "QR Lost Things Test",
                 "parent" : "template",
-                "qr": qr_svg,
+                "qr_svg_path_d": qr_svg_path_d,
             });
     let body = hb.render("done", &data).unwrap();
     HttpResponse::Ok().body(body)
@@ -74,11 +74,11 @@ pub async fn confirm_post(
 ) -> HttpResponse {
     let body = match confirm_form.validate() {
         Ok(_) => {
-            let qr_svg = manager::check_qr_code(&confirm_form.cid, &confirm_form.code);
+            let qr_svg = manager::check_confirm_code(&confirm_form.cid, &confirm_form.code);
             let data = json!({
                 "title" : "QR Lost Things",
                 "parent" : "template",
-                "qr": qr_svg,
+                "qr_svg_path_d": qr_svg,
             });
             hb.render("done", &data).unwrap()
         }
@@ -92,3 +92,17 @@ pub async fn confirm_post(
     };
     HttpResponse::Ok().body(body)
 }
+
+#[post("/print")]
+pub async fn print(
+    hb: web::Data<Handlebars<'_>>,
+) -> HttpResponse {
+
+    let qr_svg = manager::get_qr_code_path_d("test");
+    let data = json!({
+                "qr_svg_path_d": qr_svg,
+            });
+    let body = hb.render("print", &data).unwrap();
+    HttpResponse::Ok().content_type("image/svg+xml").body(body)
+}
+
