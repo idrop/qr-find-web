@@ -7,11 +7,10 @@ extern crate serde_json;
 
 use std::env;
 use std::io;
-use std::sync::Arc;
 
 use actix_files::Files;
-use actix_web::{App, HttpServer, web};
 use actix_web::middleware::Logger;
+use actix_web::{web, App, HttpServer};
 use env_logger::Env;
 use handlebars::Handlebars;
 
@@ -41,21 +40,24 @@ async fn main() -> io::Result<()> {
             .service(routes::index_post)
             .service(routes::confirm_post)
             .service(routes::print)
+            .service(routes::get_print)
             .service(routes::healthcheck)
-            .service(routes::test)
     })
-        .workers(num_workers())
-        .bind(bind_address())?
-        .run()
-        .await
+    .workers(num_workers())
+    .bind(bind_address())?
+    .run()
+    .await
 }
 
 fn num_workers() -> usize {
-    env::var("NUM_WORKERS").unwrap_or("3".to_string()).parse().unwrap()
+    env::var("NUM_WORKERS")
+        .unwrap_or_else(|_| "3".to_string())
+        .parse()
+        .unwrap()
 }
 
 fn bind_address() -> String {
-    let address = env::var("ADDRESS").unwrap_or("0.0.0.0".to_string());
-    let port = env::var("PORT").unwrap_or("8080".to_string());
+    let address = env::var("ADDRESS").unwrap_or_else(|_| "0.0.0.0".to_string());
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     [address, ":".to_string(), port].concat()
 }

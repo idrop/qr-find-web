@@ -1,8 +1,11 @@
-use actix_web::{HttpResponse, web};
+use actix_web::web::{Form};
+use actix_web::{web, HttpResponse};
 use handlebars::Handlebars;
+use nanoid::nanoid;
 use validator::Validate;
 
 use crate::data;
+use crate::data::{ConfirmForm, PrintPosition};
 use crate::service::manager;
 
 #[get("/healthcheck")]
@@ -21,19 +24,6 @@ pub async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
     HttpResponse::Ok().body(body)
 }
 
-#[get("/test")]
-pub async fn test(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
-    let qr_svg_path_d = manager::get_qr_code_path_d("test").unwrap();
-    let data = json!({
-                "title" : "QR Lost Things Test",
-                "parent" : "template",
-                "qr_svg_path_d": qr_svg_path_d,
-            });
-    let body = hb.render("done", &data).unwrap();
-    HttpResponse::Ok().body(body)
-}
-
-
 #[post("/")]
 pub async fn index_post(
     hb: web::Data<Handlebars<'_>>,
@@ -42,18 +32,16 @@ pub async fn index_post(
     let body = match email_form.validate() {
         Ok(_) => {
             let email = &email_form.email;
-            let cid = manager::send_confirm_code(&email).unwrap();
+            let cid = manager::send_confirm_code(email).unwrap();
             let data = json!({
                 "title" : "QR Lost Things",
                 "parent" : "template",
                 "cid": cid,
-                "email" : &email,
+                "email" : email,
             });
             hb.render("confirm", &data).unwrap()
         }
-        Err(e) => {
-            warn!("😀 just logging an err with err: {}", e);
-
+        Err(_) => {
             let data = json!({
                 "title" : "QR Lost Things",
                 "parent" : "template",
@@ -74,35 +62,51 @@ pub async fn confirm_post(
 ) -> HttpResponse {
     let body = match confirm_form.validate() {
         Ok(_) => {
-            let qr_svg = manager::check_confirm_code(&confirm_form.cid, &confirm_form.code);
-            let data = json!({
-                "title" : "QR Lost Things",
-                "parent" : "template",
-                "qr_svg_path_d": qr_svg,
-            });
-            hb.render("done", &data).unwrap()
+            let ok = manager::check_confirm_code(&confirm_form.cid, &confirm_form.code);
+            if !ok {
+                confirm_error_render(hb, &confirm_form)
+            } else {
+                let qr_d = manager::get_qr_code_path_d("url", &confirm_form.cid).unwrap();
+                let data = json!({
+                    "title" : "QR Lost Things",
+                    "parent" : "template",
+                    "qr_svg_path_d": qr_d,
+                });
+                hb.render("done", &data).unwrap()
+            }
         }
         Err(e) => {
             warn!("err with confirm code: {}", e);
-            let data = json!({
-                "error": "Confirm code is invalid",
-            });
-            hb.render("confirm", &data).unwrap()
+            confirm_error_render(hb, &confirm_form)
         }
     };
     HttpResponse::Ok().body(body)
 }
 
+fn confirm_error_render(hb: web::Data<Handlebars<'_>>, confirm_form: &Form<ConfirmForm>) -> String {
+    let data = json!({
+        "title" : "QR Lost Things",
+        "parent" : "template",
+        "cid": &confirm_form.cid,
+        "email" : &confirm_form.email,
+        "code-error" : true
+    });
+    hb.render("confirm", &data).unwrap()
+}
+
 #[post("/print")]
 pub async fn print(
     hb: web::Data<Handlebars<'_>>,
+    print_form: web::Form<data::PrintForm>,
 ) -> HttpResponse {
+    let layout = manager::get_qr_print("https://short.url", &print_form.cid, 14);
 
-    let qr_svg = manager::get_qr_code_path_d("test");
     let data = json!({
-                "qr_svg_path_d": qr_svg,
-            });
+        "qr_svg_path_d": layout.qr_svg_path_d,
+        "positions": layout.positions,
+        "x_max": layout.x_max,
+        "y_max": layout.y_max,
+    });
     let body = hb.render("print", &data).unwrap();
     HttpResponse::Ok().content_type("image/svg+xml").body(body)
 }
-

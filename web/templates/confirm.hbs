@@ -2,8 +2,12 @@
     <div class="form-container">
         <form action="confirm" method="post">
             <input type="hidden" name="cid" value="{{cid}}">
+            <input type="hidden" name="email" value="{{email}}">
             <label for="code">Enter the 6 digit confirm code sent to {{email}}</label>
             <br/>
+            {{#if email-error}}
+                <span id="code-error">Please enter a valid code sent to youe email address</span>
+            {{/if}}
             <input id="code" class="form-field" type="number" placeholder="6 number code" name="code" maxlength="6"
                    minlength="6"/>
 
