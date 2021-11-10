@@ -40,7 +40,6 @@ async fn main() -> io::Result<()> {
             .service(routes::index_post)
             .service(routes::confirm_post)
             .service(routes::print)
-            .service(routes::get_print)
             .service(routes::healthcheck)
     })
     .workers(num_workers())
