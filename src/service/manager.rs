@@ -14,7 +14,6 @@ pub fn send_confirm_code(_email: &str) -> Result<String, String> {
 pub fn check_confirm_code(_cid: &str, _confirm_code: &str) -> bool {
     // todo sqs sub topic "cid" to retrieve confirm code
     // todo compare topic confirm code with given confirm_code
-
     true
 }
 

@@ -8,9 +8,7 @@ const SPACE: &str = " ";
 
 pub fn get_qr_path_d(url_prefix: &str, id: &str) -> String {
     let url = &[url_prefix, id].concat();
-    // Make and print the QR Code symbol
     let qr: QrCode = QrCode::encode_text(url, QrCodeEcc::High).unwrap();
-    // to_svg_string(&qr, 4)
     get_svg_path_d(qr, BORDER)
 }
 
