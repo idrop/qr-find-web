@@ -1,4 +1,4 @@
-name: Docker
+name: Publish Image
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -10,15 +10,12 @@ on:
     branches: [ main ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ main ]
 
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-
 
 jobs:
   build:
@@ -29,6 +26,7 @@ jobs:
       packages: write
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -59,3 +57,10 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Invoke deploy
+        run: |
+          curl -X POST https://api.github.com/repos/idrop/qr-find-deploy/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN_INVOKE_DEPLOY }} \
+          --data '{"event_type": "deploy", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
